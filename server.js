@@ -7,159 +7,42 @@ const PORT = 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const users = [
+app.use(express.static('public')); //make files in public accsessible
+
+//array of users
+const users = [ 
     {
-        email: 'benjamin@example.com',
-        password: 'password123'
+        email: 'benjamin@icloud.com',
+        password: 'benja123'
     },
     {
-        email: 'john@example.com',
+        email: 'john@gmail.com',
         password: 'john123'
     },
     {
-        email: 'jane@example.com',
+        email: 'jane@hotmail.com',
         password: 'jane123'
     }
 ];
 
 
-// LOGIN PAGE
+// LOGIN Route
 app.get('/', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Login</title>
 
-            <style>
-                .hidemessage {
-                    display: none;
-                }
+    res.sendFile(__dirname + '/public/index.html');
 
-                .showmessage {
-                    display: block;
-                }
-            </style>
-        </head>
-
-        <body>
-            <h1>Login</h1>
-
-            <form id="loginForm">
-
-                <label>Email:</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    required
-                >
-
-                <br><br>
-
-                <label>Password:</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    required
-                >
-
-                <br><br>
-
-                <button type="submit">Login</button>
-
-            </form>
-
-            <div id="errormsg" class="hidemessage">
-                User credentials do not match
-            </div>
-
-            <script>
-
-                const loginForm = document.getElementById('loginForm');
-
-                loginForm.addEventListener('submit', async (event) => {
-
-                    event.preventDefault();
-
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-
-                    const response = await fetch('/login/attempt', {
-
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-
-                        body: JSON.stringify({
-                            email: email,
-                            password: password
-                        })
-
-                    });
-
-                    const result = await response.json();
-
-                    const errorMessage = document.getElementById('errormsg');
-
-                    if (result.ok === false) {
-
-                        errorMessage.classList.remove('hidemessage');
-
-                        errorMessage.classList.add('showmessage');
-
-                    } else {
-
-                        errorMessage.classList.remove('showmessage');
-
-                        errorMessage.classList.add('hidemessage');
-
-                        window.location.href = '/account';
-
-                    }
-
-                });
-
-            </script>
-
-        </body>
-        </html>
-    `);
 });
 
 
-// ACCOUNT PAGE
+// Account Route
 app.get('/account', (req, res) => {
 
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Account</title>
-        </head>
-
-        <body>
-
-            <h2>My Account</h2>
-
-            <img 
-                src="https://via.placeholder.com/150" 
-                alt="Profile image"
-            >
-
-            <p>Name: Benjamin Frivoll</p>
-            <p>Email: benjamin@example.com</p>
-            <p>Account type: Student</p>
-
-        </body>
-        </html>
-    `);
+    res.sendFile(__dirname + '/public/account.html');
 
 });
 
 
-// LOGIN ATTEMPT
+// Login Attempt
 app.post('/login/attempt', (req, res) => {
 
     const { email, password } = req.body;
@@ -168,15 +51,15 @@ app.post('/login/attempt', (req, res) => {
         user => user.email === email && user.password === password
     );
 
-    if (user) {
+    if (user) {         //if user = true (if credentials is coorect)
 
-        res.json({
+        res.json({      //re route to account page
             ok: true
         });
 
     } else {
 
-        res.json({
+        res.json({      //return error message
             ok: false,
             errors: {}
         });
@@ -187,6 +70,6 @@ app.post('/login/attempt', (req, res) => {
 
 
 // START SERVER
-app.listen(PORT, () => {
+app.listen(PORT, () => {    //
     console.log(`Server running at http://localhost:${PORT}`);
 });
